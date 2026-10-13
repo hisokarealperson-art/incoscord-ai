@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#09090f" />
+<title>IncoScord AI — No-Nonsense Chat</title>
+<style>
+:root{--bg:#09090f;--panel:#11111b;--panel2:#171725;--line:#29293c;--text:#f5f5ff;--muted:#a1a1bd;--accent:#a78bfa;--accent2:#7c3aed;--good:#4ade80;--danger:#fb7185}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100dvh;display:grid;grid-template-columns:270px 1fr;overflow:hidden}.sidebar{background:#0d0d15;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 13px;min-width:0}.brand{display:flex;gap:11px;align-items:center;padding:5px 7px 19px}.logo{height:42px;width:42px;border-radius:14px;background:linear-gradient(140deg,#c4b5fd,#7c3aed 70%);display:grid;place-items:center;color:#120b24;font-size:23px;font-weight:950;box-shadow:0 8px 28px #7c3aed30}.brand h1{font-size:16px;letter-spacing:-.5px;margin:0}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.new-chat{width:100%;border:1px solid #4c3c74;background:#1d1730;color:#f4efff;border-radius:12px;padding:12px;text-align:left;font-weight:700}.new-chat span{float:right;font-size:18px}.side-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#797994;padding:24px 8px 9px}.history{overflow:auto;flex:1}.history-item{display:block;width:100%;text-align:left;padding:10px;border:0;border-radius:9px;background:transparent;color:#c7c7d9;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:13px}.history-item:hover,.history-item.active{background:#1b1b2a;color:white}.side-footer{border-top:1px solid var(--line);padding-top:12px}.settings-btn{background:transparent;border:1px solid var(--line);border-radius:10px;color:#ddddee;padding:10px 12px;text-align:left;width:100%;font-size:13px}.age-note{color:#77778e;font-size:10px;line-height:1.5;padding:12px 5px 0}
+.main{min-width:0;display:flex;flex-direction:column;position:relative}.topbar{height:64px;flex-shrink:0;border-bottom:1px solid #20202d;display:flex;align-items:center;justify-content:space-between;padding:0 22px;gap:12px;background:#0b0b12d9}.top-left{display:flex;align-items:center;gap:10px}.top-left strong{font-size:14px}.status{font-size:11px;color:#c4b5fd;border:1px solid #41315f;background:#1a1428;padding:5px 9px;border-radius:99px}.top-right{display:flex;gap:8px;align-items:center}.pill-btn{border:1px solid var(--line);background:var(--panel);color:#d7d7e8;padding:8px 11px;border-radius:9px;font-size:12px}.chat-scroll{flex:1;overflow-y:auto;padding:32px 18px 24px;scroll-behavior:smooth}.conversation{width:min(790px,100%);margin:0 auto}.welcome{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 0 70px}.hero-icon{width:74px;height:74px;border-radius:24px;background:linear-gradient(140deg,#b8a1ff,#702de0);display:grid;place-items:center;color:#150b27;font-size:36px;font-weight:1000;box-shadow:0 14px 50px #8143de35;margin-bottom:23px}.welcome h2{font-size:clamp(29px,5vw,44px);letter-spacing:-1.7px;line-height:1.08;margin:0 0 14px}.welcome h2 em{font-style:normal;color:var(--accent)}.welcome p{max-width:480px;color:var(--muted);line-height:1.65;font-size:14px;margin:0 0 26px}.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(550px,100%)}.suggestion{text-align:left;background:linear-gradient(135deg,#151522,#11111a);border:1px solid #2b2b40;border-radius:13px;padding:14px;color:#ededfa;font-size:13px}.suggestion:hover{border-color:#7555b7;background:#1a1728}.suggestion small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.message{display:flex;gap:13px;margin:0 0 28px;align-items:flex-start}.avatar{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;background:#232333;color:#e6e6f5}.message.assistant .avatar{background:linear-gradient(140deg,#baa5ff,#7c3aed);color:#130a21}.message-body{flex:1;min-width:0;padding-top:3px}.message-name{font-size:12px;font-weight:750;margin-bottom:8px;color:#deddf2}.message-text{font-size:14px;line-height:1.8;color:#e7e7f2;overflow-wrap:anywhere;white-space:pre-wrap}.message.user .message-text{color:#fafaff}.message-actions{display:flex;gap:7px;margin-top:9px}.tiny{border:1px solid var(--line);background:#12121d;color:#aaaac2;padding:4px 8px;border-radius:7px;font-size:11px}.typing{display:inline-flex;gap:5px;padding:9px 0}.typing i{width:6px;height:6px;border-radius:50%;background:#baa5ff;animation:bop .9s infinite alternate}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}@keyframes bop{to{opacity:.25;transform:translateY(-3px)}}
+.composer-wrap{padding:10px 18px max(15px,env(safe-area-inset-bottom));background:linear-gradient(0deg,#09090f 75%,#09090f00)}.composer{width:min(790px,100%);margin:auto;border:1px solid #36364d;background:#12121d;border-radius:17px;padding:11px 12px 9px;box-shadow:0 10px 40px #0005}.composer textarea{display:block;width:100%;resize:none;min-height:30px;max-height:180px;border:0;outline:0;background:transparent;color:#f3f2ff;padding:6px 4px;font-size:14px;line-height:1.6}.composer textarea::placeholder{color:#777790}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px}.composer-hint{font-size:10px;color:#85859e}.composer-tools{display:flex;align-items:center;gap:9px}.model-label{color:#a9a9c0;font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.send{border:0;border-radius:10px;background:var(--accent);color:#170d2a;font-weight:900;padding:9px 14px;min-width:70px}.send:disabled{opacity:.55;cursor:not-allowed}.notice{width:min(790px,100%);margin:0 auto 5px;color:#77778f;text-align:center;font-size:10px;line-height:1.5}.mobile-menu{display:none}.modal-backdrop{position:fixed;inset:0;background:#000a;z-index:10;display:none;align-items:center;justify-content:center;padding:16px}.modal-backdrop.show{display:flex}.modal{width:min(560px,100%);max-height:90dvh;overflow:auto;background:#11111b;border:1px solid #33334a;border-radius:18px;padding:21px;box-shadow:0 25px 90px #0009}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}.modal h3{margin:0;font-size:18px}.close{border:1px solid var(--line);background:#191925;color:white;border-radius:8px;padding:5px 9px}.modal p{font-size:12px;color:var(--muted);line-height:1.65}.field{margin:15px 0}.field label{display:block;font-size:12px;color:#e5e2f8;font-weight:700;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;background:#090910;border:1px solid #34344a;color:#f5f4ff;border-radius:10px;padding:11px;font-size:13px}.field textarea{min-height:90px;resize:vertical}.row-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.save{background:var(--accent);border:0;border-radius:10px;padding:11px 16px;color:#180d2a;font-weight:800}.secondary{background:#1a1a28;border:1px solid var(--line);color:#eee;border-radius:10px;padding:11px 14px}.modal-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}.checkrow{display:flex;gap:10px;align-items:flex-start;color:#ddddee;font-size:12px;line-height:1.5}.checkrow input{margin-top:3px;accent-color:var(--accent)}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#f0eaff;color:#211037;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:700;box-shadow:0 10px 30px #0007;display:none;z-index:30;max-width:90vw}.toast.show{display:block}
+
+.search-strip{width:min(790px,calc(100% - 36px));margin:12px auto 0;display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #29293c;background:#11111b;border-radius:13px;flex-shrink:0}.search-symbol{color:#bdb0ff;font-size:20px;padding:0 4px}.search-input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#f5f5ff;padding:8px 2px;font-size:13px}.search-input::placeholder{color:#777790}.search-go{white-space:nowrap;border:0;border-radius:9px;background:#a78bfa;color:#170d2a;font-size:12px;font-weight:850;padding:9px 11px}.ask-search{white-space:nowrap}.composer-tools .send{min-width:70px}.voice-btn{border:1px solid #514174;background:#211833;color:#e9ddff;border-radius:9px;padding:7px 9px;font-size:12px;white-space:nowrap}.voice-btn.active{background:#3a1730;border-color:#a85575;color:#ffe4ed}.attach-btn{border:1px solid #34344a;background:#191925;color:#d8d2ef;border-radius:9px;padding:7px 9px;font-size:12px;white-space:nowrap}.attach-btn:hover,.pill-btn:hover{border-color:#7555b7}.attachment-tray{display:flex;gap:8px;flex-wrap:wrap;padding:7px 0 2px}.attachment-tray:empty{display:none}.media-chip{display:flex;align-items:center;gap:8px;max-width:100%;padding:6px 8px;border-radius:10px;border:1px solid #34344a;background:#0d0d16;color:#deddf2;font-size:11px}.media-thumb{width:34px;height:34px;flex:0 0 34px;object-fit:cover;border-radius:6px;background:#242436;display:grid;place-items:center}.media-meta{min-width:0;max-width:150px;overflow:hidden}.media-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}.media-size{display:block;color:#85859e;font-size:10px;margin-top:2px}.remove-media{border:0;background:transparent;color:#aaaac2;padding:3px 5px;font-size:15px}.message-files{font-size:11px;color:#a9a0ce;margin-top:8px;line-height:1.5}.upload-help{font-size:10px;color:#85859e;line-height:1.5;padding:5px 2px 0}.hidden-file{display:none}
+ .mode-strip{width:min(790px,100%);margin:0 auto 8px;display:flex;align-items:center;gap:7px;overflow-x:auto;padding:2px 0 5px;scrollbar-width:thin}.mode-strip-label{flex:0 0 auto;color:#85859e;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-right:2px}.mode-button{flex:0 0 auto;border:1px solid #303047;background:#12121d;color:#c5c5db;padding:7px 10px;border-radius:999px;font-size:11px;white-space:nowrap}.mode-button:hover{border-color:#7555b7}.mode-button.active{border-color:#8b6ae0;background:#251b3d;color:#e8ddff}.data-actions{display:flex;gap:8px;flex-wrap:wrap}.data-actions button{background:#191925;border:1px solid #39394f;color:#efefff;border-radius:9px;padding:9px 10px;font-size:12px}.data-actions button.danger{border-color:#633340;color:#ffc3cf}
+@media(max-width:720px){.mode-strip{width:100%;gap:6px}.mode-button{padding:7px 9px}.search-strip{width:calc(100% - 22px);margin-top:8px;gap:5px;padding:6px}.search-input{font-size:12px}.search-go{padding:9px 8px;font-size:11px}.ask-search{padding:7px 8px}.composer-tools{gap:5px}.attach-btn{padding:7px 8px}.voice-btn{padding:7px 7px;font-size:11px}.composer-hint{display:none}.media-meta,.media-name{max-width:95px}}
+
+@media(max-width:720px){.app{grid-template-columns:1fr}.sidebar{position:fixed;z-index:5;top:0;bottom:0;left:0;width:270px;transform:translateX(-105%);transition:transform .2s;box-shadow:20px 0 60px #0007}.sidebar.open{transform:translateX(0)}.mobile-menu{display:inline-flex}.topbar{padding:0 13px;height:58px}.chat-scroll{padding:23px 14px 12px}.composer-wrap{padding-left:11px;padding-right:11px}.suggestions{grid-template-columns:1fr}.welcome{padding-top:15px}.welcome h2{font-size:32px}.model-label{max-width:100px}.row-fields{grid-template-columns:1fr}.brand{padding-bottom:14px}.top-right .pill-btn{padding:7px 9px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">I</div><div><h1>IncoScord AI <span style="color:#c4b5fd">✦</span></h1><small>Say it straight.</small></div></div>
+    <button class="new-chat" id="newChat">＋ &nbsp; New chat <span>⌘ K</span></button>
+    <div class="side-label">Recent chats</div><div class="history" id="history"></div>
+    <div class="side-footer"><button class="settings-btn" id="openSettings">⚙ &nbsp; AI connection & settings</button><div class="age-note">18+ intended audience. Use responsibly. Your AI provider's capabilities and rules still apply.</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left"><button class="pill-btn mobile-menu" id="menuBtn" aria-label="Open menu">☰</button><strong>Chat</strong><span class="status" id="connectionStatus">● Not connected</span></div>
+      <div class="top-right"><button class="pill-btn" id="exportBtn">↥ Export</button><button class="pill-btn" id="clearBtn">Clear</button></div>
+    </header>
+    <form class="search-strip" id="webSearchForm" role="search">
+      <span class="search-symbol" aria-hidden="true">⌕</span>
+      <input class="search-input" id="webSearchInput" type="search" placeholder="Search the web…" aria-label="Search the web" autocomplete="off" />
+      <button class="pill-btn ask-search" id="askSearchBtn" type="button">Ask AI</button>
+      <button class="search-go" type="submit">Search ↗</button>
+    </form>
+    <section class="chat-scroll" id="chatScroll"><div class="conversation" id="conversation"></div></section>
+    <div class="composer-wrap">
+      <div class="mode-strip" id="modeStrip" aria-label="Choose an AI task mode">
+        <span class="mode-strip-label">Mode</span>
+        <button type="button" class="mode-button active" data-mode="general" aria-pressed="true">💬 General</button>
+        <button type="button" class="mode-button" data-mode="research" aria-pressed="false">🔎 Research</button>
+        <button type="button" class="mode-button" data-mode="study" aria-pressed="false">📚 Study</button>
+        <button type="button" class="mode-button" data-mode="writing" aria-pressed="false">✍️ Write</button>
+        <button type="button" class="mode-button" data-mode="coding" aria-pressed="false">💻 Code</button>
+        <button type="button" class="mode-button" data-mode="summarize" aria-pressed="false">🧾 Summarize</button>
+        <button type="button" class="mode-button" data-mode="planning" aria-pressed="false">🗓️ Plan</button>
+      </div>
+      <div class="quick-actions" style="width:min(790px,100%);margin:0 auto 9px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="pill-btn" id="generateImageBtn" type="button">🎨 Generate image</button>
+        <button class="pill-btn" id="generateVideoBtn" type="button">🎬 Generate video</button>
+        <button class="pill-btn" id="memoryBtn" type="button">🧠 Memory</button>
+      </div>
+      <div class="notice">AI can make mistakes. Don't share passwords, private keys, or sensitive personal information.</div>
+      <div class="composer">
+        <div class="attachment-tray" id="attachmentTray" aria-live="polite"></div>
+        <textarea id="prompt" rows="1" placeholder="Ask anything. Attach a photo or video to analyze…" aria-label="Message IncoScord AI"></textarea>
+        <input class="hidden-file" id="mediaInput" type="file" accept="image/*,video/mp4,video/webm,video/quicktime,video/ogg,.txt,.md,.csv,.json,.js,.ts,.py,.html,.css,.log,.sql,.xml,.yaml,.yml,.toml" multiple />
+        <div class="composer-bottom"><div class="composer-tools"><button class="attach-btn" id="attachBtn" type="button">＋ Files</button><button class="voice-btn" id="voiceBtn" type="button" aria-pressed="false" title="Start hands-free voice chat">🎙 Voice chat</button><span class="composer-hint">Enter to send · Shift + Enter for newline</span></div><div class="composer-tools"><span class="model-label" id="modelLabel">Set up a model in settings</span><button class="send" id="sendBtn">Send ↑</button></div></div>
+        <div class="upload-help">Voice chat uses your browser's speech recognition and speech synthesis. Allow microphone access when asked. Uploaded videos are still analyzed as silent frames.</div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="modal-backdrop" id="settingsBackdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal"><div class="modal-head"><h3 id="settingsTitle">AI connection</h3><button class="close" id="closeSettings">✕</button></div>
+    <p>Connect to your own secure IncoScord backend (recommended) or a compatible Chat Completions endpoint. Server mode supports web-grounded answers and image generation; video generation requires API access to a supported video model. Never publish an API key in browser code.</p>
+    <div class="field"><label for="endpoint">API endpoint</label><input id="endpoint" type="url" placeholder="/api/chat (server mode)" autocomplete="url" /></div>
+    <div class="row-fields"><div class="field"><label for="model">Model name</label><input id="model" placeholder="gpt-5 (server mode default)" /></div><div class="field"><label for="temperature">Creativity <span id="tempValue">0.8</span></label><input id="temperature" type="range" min="0" max="1.5" value="0.8" step="0.1" style="padding:8px 0" /></div></div>
+    <div class="field"><label for="apiKey">API key (optional for local services)</label><input id="apiKey" type="password" placeholder="Paste your key" autocomplete="off" /></div>
+    <div class="field"><label for="memoryNotes">Long-term memory (saved on this device)</label><textarea id="memoryNotes" placeholder="Add preferences or facts IncoScord should remember between chats…"></textarea><small style="color:#a1a1bd">Memory is local to this browser. It does not train the underlying AI model.</small></div>
+    <div class="field"><label class="checkrow" style="padding:0"><input type="checkbox" id="alwaysSearch" checked /> <span>Require web search for every answer (server mode). Turn off to let the AI decide when to search.</span></label></div>
+    <div class="field"><label class="checkrow" style="padding:0"><input type="checkbox" id="useMemory" checked /> <span>Include my saved memory in replies</span></label></div>
+    <div class="field"><label for="systemPrompt">Personality / system instructions</label><textarea id="systemPrompt">You are IncoScord AI: direct, candid, useful, curious, and non-judgmental. Answer the user's actual question clearly and in depth. Avoid unnecessary lectures or moralizing. Be honest when you are uncertain, and never pretend to know something you don't. The user prefers a casual, internet-native tone. Discuss mature topics respectfully where allowed by the chosen model and applicable rules.</textarea></div>
+    <label class="checkrow"><input type="checkbox" id="adultConfirm" /> <span>I confirm I am 18 or older and want an adult-oriented interface. This is an honor-system setting, not formal age verification.</span></label>
+    <p><b>Privacy:</b> the API key is kept in this browser tab's session storage, not saved to the chat history. If you publish this file as a public site, don't embed your key; use a secured backend instead. Your selected AI provider receives prompts you send.</p>
+    <div class="field"><label>Data controls</label><div class="data-actions"><button type="button" id="exportAllData">⬇ Export all chats & memory</button><button type="button" class="danger" id="eraseLocalData">🗑 Erase local chats & memory</button></div><small style="display:block;color:#a1a1bd;margin-top:7px;line-height:1.5">Your chats and memory are kept in this browser. Export a backup before erasing. API usage and provider-side retention are controlled by your AI provider.</small></div>
+    <div class="modal-actions"><button class="secondary" id="forgetKey">Forget key</button><button class="save" id="saveSettings">Save settings</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const STORE = 'incoscord_settings_v1';
+  const CHAT_STORE = 'incoscord_chats_v1';
+  let settings = { endpoint:'', model:'', temperature:0.8, systemPrompt:$('systemPrompt').value, adult:false, alwaysSearch:true, useMemory:true };
+  let chats = [];
+  let activeId = null;
+  let busy = false;
+  let controller = null;
+  let voiceChatEnabled = false;
+  let recognition = null;
+  let voiceSpeaking = false;
+  let voiceRequestPending = false;
+  let voiceRestartTimer = null;
+  let currentMode = 'general';
+  const MODE_INSTRUCTIONS = {
+    general: 'Answer the request directly. Match the amount of detail to the task.',
+    research: 'RESEARCH MODE: investigate the question carefully. Prefer primary and authoritative sources, use web search, cite links for key factual claims, compare sources when practical, and clearly separate established facts, disputed claims, and uncertainty.',
+    study: 'STUDY MODE: act as a patient tutor. Explain concepts step by step in plain language, include a worked example and a short check-for-understanding question when useful. Help the user learn rather than only giving unexplained answers.',
+    writing: 'WRITING MODE: help draft, rewrite, edit, or improve the requested text. Preserve the intended meaning and voice; improve clarity and structure. Provide the finished draft first and brief notes only when useful.',
+    coding: 'CODING MODE: identify assumptions, produce runnable code, explain how to use it, consider edge cases and security, and include tests or verification steps when practical. Do not claim code was executed unless it was.',
+    summarize: 'SUMMARIZE MODE: extract the main point, key details, action items, and unresolved questions. Do not invent missing details. If a document was attached, base the summary on its contents and mention if it was truncated.',
+    planning: 'PLANNING MODE: turn the goal into a practical ordered plan with priorities, estimated effort, dependencies, and a low-cost first step. Ask a focused clarification only if a missing detail blocks progress.'
+  };
+
+  function toast(message) { const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>t.classList.remove('show'),3000); }
+
+  // Voice uses browser APIs; audio is not sent to the IncoScord chat endpoint.
+  function recognitionApi(){ return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
+  function speakText(text){
+    if(!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance==='undefined'){toast('Read aloud is not supported in this browser.');return;}
+    const spoken=String(text||'').trim();if(!spoken)return;
+    try{
+      window.speechSynthesis.cancel();
+      const utterance=new SpeechSynthesisUtterance(spoken.slice(0,12000));
+      utterance.lang=navigator.language||'en-US';utterance.rate=1;utterance.pitch=1;
+      voiceSpeaking=true;
+      if(voiceChatEnabled){$('voiceBtn').textContent='🔊 Speaking…';$('voiceBtn').classList.add('active');}
+      utterance.onend=()=>{voiceSpeaking=false;if(voiceChatEnabled){scheduleVoiceListening(350);}else{$('voiceBtn').textContent='🎙 Voice chat';$('voiceBtn').classList.remove('active');}};
+      utterance.onerror=()=>{voiceSpeaking=false;if(voiceChatEnabled){scheduleVoiceListening(500);}else{$('voiceBtn').textContent='🎙 Voice chat';$('voiceBtn').classList.remove('active');}};
+      window.speechSynthesis.speak(utterance);
+    }catch(e){voiceSpeaking=false;toast('Could not start spoken audio in this browser.');}
+  }
+  function scheduleVoiceListening(delay=500){
+    clearTimeout(voiceRestartTimer);
+    voiceRestartTimer=setTimeout(()=>{if(voiceChatEnabled&&!busy&&!voiceRequestPending&&!voiceSpeaking)startVoiceListening();},delay);
+  }
+  function startVoiceListening(){
+    const Recognition=recognitionApi();if(!voiceChatEnabled||!Recognition||busy||voiceRequestPending||voiceSpeaking)return;
+    if(recognition){try{recognition.abort();}catch(e){}recognition=null;}
+    try{
+      const rec=new Recognition();recognition=rec;rec.lang=navigator.language||'en-US';rec.continuous=false;rec.interimResults=false;rec.maxAlternatives=1;
+      rec.onstart=()=>{if(voiceChatEnabled){$('voiceBtn').textContent='🎙 Listening…';$('voiceBtn').classList.add('active');}};
+      rec.onresult=async event=>{
+        const transcript=Array.from(event.results||[]).map(result=>result[0]?.transcript||'').join(' ').trim();
+        if(!transcript)return;
+        voiceRequestPending=true;
+        if(rec===recognition)recognition=null;
+        try{rec.stop();}catch(e){}
+        $('prompt').value=transcript;autoSize();
+        await send();
+        voiceRequestPending=false;
+        if(voiceChatEnabled&&!busy&&!voiceSpeaking)scheduleVoiceListening(450);
+      };
+      rec.onerror=event=>{
+        if(rec===recognition)recognition=null;
+        if(!voiceChatEnabled)return;
+        if(event.error==='not-allowed'||event.error==='service-not-allowed'){
+          stopVoiceChat(false);toast('Microphone blocked. Allow microphone access in your browser settings.');
+        }else if(event.error!=='no-speech'&&event.error!=='aborted'){
+          toast('Voice input error: '+event.error);
+        }
+      };
+      rec.onend=()=>{if(rec===recognition)recognition=null;if(voiceChatEnabled&&!voiceRequestPending&&!voiceSpeaking&&!busy)scheduleVoiceListening(550);};
+      rec.start();
+    }catch(e){if(recognition)recognition=null;if(voiceChatEnabled){stopVoiceChat(false);toast('Could not start the microphone. Check browser permissions and try again.');}}
+  }
+  function stopVoiceChat(showMessage=true){
+    voiceChatEnabled=false;voiceRequestPending=false;clearTimeout(voiceRestartTimer);
+    if(recognition){try{recognition.abort();}catch(e){}recognition=null;}
+    if('speechSynthesis' in window)window.speechSynthesis.cancel();voiceSpeaking=false;
+    const btn=$('voiceBtn');btn.textContent='🎙 Voice chat';btn.classList.remove('active');btn.setAttribute('aria-pressed','false');
+    if(showMessage)toast('Voice chat stopped.');
+  }
+  function toggleVoiceChat(){
+    if(voiceChatEnabled){stopVoiceChat();return;}
+    const Recognition=recognitionApi();
+    if(!Recognition){toast('Voice input is not supported here. Try Chrome on Android or desktop; Read aloud may still work.');return;}
+    if(!window.isSecureContext && location.hostname!=='localhost' && location.hostname!=='127.0.0.1'){toast('Voice chat needs HTTPS (or localhost) so the browser can use your microphone.');return;}
+    voiceChatEnabled=true;voiceRequestPending=false;$('voiceBtn').setAttribute('aria-pressed','true');$('voiceBtn').textContent='🎙 Starting…';$('voiceBtn').classList.add('active');toast('Voice chat on. Speak after the button says Listening.');startVoiceListening();
+  }
+  $('voiceBtn').addEventListener('click',toggleVoiceChat);
+  function safeLoad() {
+    try { const s=JSON.parse(localStorage.getItem(STORE)||'null'); if(s) settings={...settings,...s}; } catch(e) {}
+    try { chats=JSON.parse(localStorage.getItem(CHAT_STORE)||'[]'); if(!Array.isArray(chats)) chats=[]; } catch(e) { chats=[]; }
+    const key=sessionStorage.getItem('incoscord_api_key')||'';
+    $('endpoint').value=settings.endpoint||''; $('model').value=settings.model||''; $('temperature').value=settings.temperature??0.8; $('tempValue').textContent=$('temperature').value;
+    $('systemPrompt').value=settings.systemPrompt||''; $('adultConfirm').checked=!!settings.adult; $('apiKey').value=key;
+    $('alwaysSearch').checked=settings.alwaysSearch!==false; $('useMemory').checked=settings.useMemory!==false;
+    try { currentMode=localStorage.getItem('incoscord_mode')||'general'; } catch(e) { currentMode='general'; }
+    setMode(currentMode,false);
+    if(chats.length){ activeId=chats[0].id; } else { createChat(false); }
+    renderHistory(); renderChat(); updateConnection();
+  }
+  function persistChats(){ try { localStorage.setItem(CHAT_STORE, JSON.stringify(chats.slice(0,40))); } catch(e) { toast('Storage is full. Export chats to keep a copy.'); } }
+  function persistSettings(){ try { localStorage.setItem(STORE,JSON.stringify(settings)); } catch(e){} }
+  function activeChat(){ return chats.find(c=>c.id===activeId); }
+  function createChat(render=true){ const c={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),title:'New chat',messages:[],updated:Date.now()}; chats.unshift(c); activeId=c.id; persistChats(); renderHistory(); if(render) renderChat(); $('sidebar').classList.remove('open'); }
+  function renderHistory(){ const host=$('history'); host.innerHTML=''; if(!chats.length){host.innerHTML='<div style="padding:12px 8px;color:#77778e;font-size:12px">Your chats will show up here.</div>';return;} chats.slice().sort((a,b)=>b.updated-a.updated).forEach(c=>{const b=document.createElement('button');b.className='history-item'+(c.id===activeId?' active':'');b.textContent='▤  '+(c.title||'New chat');b.title=c.title||'New chat';b.onclick=()=>{activeId=c.id;renderHistory();renderChat();$('sidebar').classList.remove('open');};host.appendChild(b);}); }
+  function escapeHTML(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function renderChat(){ const host=$('conversation'); host.innerHTML=''; const c=activeChat(); if(!c || c.messages.length===0){const w=document.createElement('div');w.className='welcome';w.innerHTML='<div class="hero-icon">I</div><h2>Think freely.<br><em>Ask IncoScord.</em></h2><p>Research, learn, write, build, summarize files, and create. Choose a task mode below or start with a popular AI workflow.</p><div class="suggestions"><button class="suggestion" data-mode-pick="research" data-text="Research this topic thoroughly. Use reliable sources, cite important claims, and separate facts from uncertainty: ">🔎 &nbsp; Research & fact-check<small>Source-backed answers, not confident guesses</small></button><button class="suggestion" data-mode-pick="study" data-text="Teach me this topic in a simple, step-by-step way, with an example: ">📚 &nbsp; Learn something<small>Explanations, examples, and study help</small></button><button class="suggestion" data-mode-pick="summarize" data-text="Summarize the attached file or the text I provide. Extract key points and action items: ">🧾 &nbsp; Summarize a document<small>Key points from text, notes, CSV, or code files</small></button><button class="suggestion" data-mode-pick="writing" data-text="Help me draft or improve this writing. Keep my meaning and make it clearer: ">✍️ &nbsp; Write & improve<small>Messages, essays, posts, and plans</small></button><button class="suggestion" data-mode-pick="coding" data-text="Help me build or debug this. Explain assumptions, give runnable code, and include test steps: ">💻 &nbsp; Code & debug<small>Practical code with edge cases in mind</small></button><button class="suggestion" data-mode-pick="planning" data-text="Help me turn this goal into a realistic step-by-step plan: ">🗓️ &nbsp; Make a plan<small>Priorities, next steps, and low-cost starts</small></button></div>';host.appendChild(w);host.querySelectorAll('[data-text]').forEach(b=>b.onclick=()=>{if(b.dataset.modePick)setMode(b.dataset.modePick);$('prompt').value=b.dataset.text;autoSize();$('prompt').focus();});return;}
+    c.messages.forEach((m,index)=>{const el=document.createElement('article');el.className='message '+(m.role==='user'?'user':'assistant');const avatar=m.role==='user'?'Y':'I';const name=m.role==='user'?'You':'IncoScord AI';el.innerHTML='<div class="avatar">'+avatar+'</div><div class="message-body"><div class="message-name">'+name+'</div><div class="message-text">'+escapeHTML(m.content||'')+'</div>'+(m.attachments&&m.attachments.length?'<div class="message-files">📎 '+escapeHTML(m.attachments.join(' · '))+'</div>':'')+(m.role==='assistant'?'<div class="message-actions"><button class="tiny" data-copy="'+index+'">Copy</button><button class="tiny" data-speak="'+index+'">🔊 Read aloud</button></div>':'')+'</div>';host.appendChild(el);});
+    host.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const m=activeChat().messages[Number(b.dataset.copy)];navigator.clipboard?.writeText(m.content).then(()=>toast('Copied')).catch(()=>toast('Could not access clipboard'));});
+    host.querySelectorAll('[data-speak]').forEach(b=>b.onclick=()=>{const m=activeChat().messages[Number(b.dataset.speak)];if('speechSynthesis' in window&&window.speechSynthesis.speaking){window.speechSynthesis.cancel();voiceSpeaking=false;if(voiceChatEnabled)scheduleVoiceListening(250);else toast('Speech stopped.');}else speakText(m.content);});
+    if(busy){const el=document.createElement('article');el.className='message assistant';el.innerHTML='<div class="avatar">I</div><div class="message-body"><div class="message-name">IncoScord AI</div><div class="typing"><i></i><i></i><i></i></div></div>';host.appendChild(el);}
+    requestAnimationFrame(()=>$('chatScroll').scrollTop=$('chatScroll').scrollHeight);
+  }
+  function updateConnection(){const ready=!!(settings.endpoint&&settings.model);$('connectionStatus').textContent=ready?'● '+(settings.model.length>17?settings.model.slice(0,17)+'…':settings.model):'● Not connected';$('connectionStatus').style.color=ready?'#86efac':'#c4b5fd';$('modelLabel').textContent=ready?settings.model:'Set up a model in settings';}
+  function openSettings(){ $('settingsBackdrop').classList.add('show'); $('apiKey').value=sessionStorage.getItem('incoscord_api_key')||''; $('memoryNotes').value=localStorage.getItem('incoscord_memory')||''; $('alwaysSearch').checked=settings.alwaysSearch!==false; $('useMemory').checked=settings.useMemory!==false; if(!$('endpoint').value)$('endpoint').value='/api/chat'; if(!$('model').value)$('model').value='gpt-5'; }
+  function closeSettings(){ $('settingsBackdrop').classList.remove('show'); }
+  $('openSettings').onclick=openSettings; $('closeSettings').onclick=closeSettings; $('settingsBackdrop').addEventListener('click',e=>{if(e.target===$('settingsBackdrop'))closeSettings();});
+  $('temperature').addEventListener('input',()=> $('tempValue').textContent=$('temperature').value);
+  $('saveSettings').onclick=()=>{settings.endpoint=$('endpoint').value.trim();settings.model=$('model').value.trim();settings.temperature=Number($('temperature').value);localStorage.setItem('incoscord_memory',$('memoryNotes').value.trim());settings.systemPrompt=$('systemPrompt').value.trim()||'You are a helpful, direct AI assistant.';settings.adult=$('adultConfirm').checked;settings.alwaysSearch=$('alwaysSearch').checked;settings.useMemory=$('useMemory').checked;const key=$('apiKey').value.trim();if(key)sessionStorage.setItem('incoscord_api_key',key);else sessionStorage.removeItem('incoscord_api_key');persistSettings();updateConnection();closeSettings();toast('Settings saved');};
+  $('forgetKey').onclick=()=>{sessionStorage.removeItem('incoscord_api_key');$('apiKey').value='';toast('API key forgotten for this tab');};
+  $('newChat').onclick=()=>createChat(); $('menuBtn').onclick=()=>$('sidebar').classList.toggle('open');
+  $('clearBtn').onclick=()=>{const c=activeChat();if(!c)return;c.messages=[];c.title='New chat';c.updated=Date.now();persistChats();renderHistory();renderChat();toast('Chat cleared');};
+  $('exportBtn').onclick=()=>{const c=activeChat();if(!c){toast('No chat to export');return;}const body=c.messages.map(m=>(m.role==='user'?'YOU':'INCOSCORD AI')+'\n'+m.content).join('\n\n');downloadFile((c.title||'incoscord-chat').replace(/[^a-z0-9-_ ]/gi,'').trim().replace(/\s+/g,'-')+'.txt',c.title+'\n\n'+body,'text/plain;charset=utf-8');};
+  function downloadFile(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  $('exportAllData').onclick=()=>{const backup={app:'IncoScord AI',exportedAt:new Date().toISOString(),chats, memory:localStorage.getItem('incoscord_memory')||'', settings:{endpoint:settings.endpoint,model:settings.model,temperature:settings.temperature,systemPrompt:settings.systemPrompt,adult:settings.adult,alwaysSearch:settings.alwaysSearch!==false,useMemory:settings.useMemory!==false},note:'API keys are intentionally excluded. Chats and memory are browser-local; provider-side data handling is separate.'};downloadFile('incoscord-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(backup,null,2),'application/json;charset=utf-8');toast('Backup downloaded');};
+  $('eraseLocalData').onclick=()=>{if(!confirm('Erase all local IncoScord chats, memory, and saved settings on this browser? Export a backup first if you need one.'))return;localStorage.removeItem(CHAT_STORE);localStorage.removeItem(STORE);localStorage.removeItem('incoscord_memory');localStorage.removeItem('incoscord_mode');sessionStorage.removeItem('incoscord_api_key');toast('Local data erased');setTimeout(()=>location.reload(),350);};
+  let pendingFiles = [];
+  let mediaCounter = 0;
+  const TEXT_FILE_EXTS = new Set(['txt','md','markdown','csv','json','js','ts','jsx','tsx','py','html','htm','css','log','sql','xml','yaml','yml','toml','ini','sh','bat','java','c','cpp','h','go','rs','php']);
+  function isTextDocument(file){const ext=(file.name.split('.').pop()||'').toLowerCase();return TEXT_FILE_EXTS.has(ext)||file.type.startsWith('text/')||['application/json','application/javascript','application/xml'].includes(file.type);}
+  function mediaKind(file){if(file.type.startsWith('image/'))return 'Photo';if(file.type.startsWith('video/'))return 'Video';return 'Text file';}
+  function formatBytes(n){if(n<1024*1024)return Math.max(1,Math.round(n/1024))+' KB';return (n/(1024*1024)).toFixed(1)+' MB';}
+  function clearPendingFiles(){pendingFiles.forEach(item=>{try{URL.revokeObjectURL(item.url);}catch(e){}});pendingFiles=[];$('mediaInput').value='';renderAttachmentTray();}
+  function renderAttachmentTray(){
+    const tray=$('attachmentTray');tray.innerHTML='';
+    pendingFiles.forEach((item,i)=>{
+      const chip=document.createElement('div');chip.className='media-chip';
+      if(item.file.type.startsWith('image/')){const img=document.createElement('img');img.className='media-thumb';img.src=item.url;img.alt='';chip.appendChild(img);}
+      else{const icon=document.createElement('div');icon.className='media-thumb';icon.textContent=item.file.type.startsWith('video/')?'▶':'TXT';icon.setAttribute('aria-hidden','true');chip.appendChild(icon);}
+      const meta=document.createElement('div');meta.className='media-meta';const title=document.createElement('span');title.className='media-name';title.textContent=item.file.name;title.title=item.file.name;const size=document.createElement('span');size.className='media-size';size.textContent=mediaKind(item.file)+' · '+formatBytes(item.file.size);meta.append(title,size);chip.appendChild(meta);
+      const remove=document.createElement('button');remove.type='button';remove.className='remove-media';remove.textContent='×';remove.setAttribute('aria-label','Remove '+item.file.name);remove.onclick=()=>{URL.revokeObjectURL(item.url);pendingFiles.splice(i,1);renderAttachmentTray();};chip.appendChild(remove);tray.appendChild(chip);
+    });
+  }
+  $('attachBtn').onclick=()=> $('mediaInput').click();
+  $('mediaInput').addEventListener('change',()=>{
+    const files=Array.from($('mediaInput').files||[]);const supported=files.filter(f=>f.type.startsWith('image/')||['video/mp4','video/webm','video/quicktime','video/ogg'].includes(f.type)||isTextDocument(f));
+    if(supported.length<files.length)toast('Some files were skipped. Choose photos, supported videos, or text/code documents.');
+    for(const file of supported){
+      if(pendingFiles.length>=4){toast('Maximum 4 files per message');break;}
+      const limitMB=file.type.startsWith('video/')?80:file.type.startsWith('image/')?20:2;
+      if(file.size>limitMB*1024*1024){toast(file.name+' is too large (max '+limitMB+' MB for this file type)');continue;}
+      if(pendingFiles.some(x=>x.file.name===file.name&&x.file.size===file.size)){continue;}
+      pendingFiles.push({id:++mediaCounter,file,url:URL.createObjectURL(file)});
+    }
+    $('mediaInput').value='';renderAttachmentTray();
+  });
+  function readFileDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Could not read '+file.name));reader.readAsDataURL(file);});}
+  function waitFor(target,eventName){return new Promise((resolve,reject)=>{const done=()=>{cleanup();resolve();};const fail=()=>{cleanup();reject(new Error('Unable to process this video. Try MP4 or WebM.'));};const cleanup=()=>{target.removeEventListener(eventName,done);target.removeEventListener('error',fail);};target.addEventListener(eventName,done,{once:true});target.addEventListener('error',fail,{once:true});});}
+  async function extractVideoFrames(file){
+    const url=URL.createObjectURL(file);const video=document.createElement('video');video.preload='auto';video.muted=true;video.playsInline=true;video.src=url;
+    try{
+      const loaded=waitFor(video,'loadedmetadata');video.load();await loaded;
+      if(video.readyState<2)await waitFor(video,'loadeddata');
+      if(!Number.isFinite(video.duration)||video.duration<=0)throw new Error('The video duration could not be read.');
+      if(video.duration>300)throw new Error('Videos longer than 5 minutes are not supported for frame analysis yet.');
+      const count=Math.min(6,Math.max(2,Math.ceil(video.duration/10)));const times=[];
+      if(count===1)times.push(0);else for(let i=0;i<count;i++)times.push(Math.max(0,Math.min(video.duration-0.05,(video.duration-0.1)*i/(count-1))));
+      const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');const frames=[];
+      for(let i=0;i<times.length;i++){
+        if(Math.abs(video.currentTime-times[i])>0.001){const seek=waitFor(video,'seeked');video.currentTime=times[i];await seek;}
+        let w=video.videoWidth||640,h=video.videoHeight||360;const scale=Math.min(1,768/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));canvas.width=w;canvas.height=h;ctx.drawImage(video,0,0,w,h);
+        frames.push({type:'text',text:'Video frame '+(i+1)+' at '+times[i].toFixed(1)+' seconds:'});frames.push({type:'image_url',image_url:{url:canvas.toDataURL('image/jpeg',0.78)}});
+      }
+      return frames;
+    }finally{video.pause();video.removeAttribute('src');video.load();URL.revokeObjectURL(url);}
+  }
+  async function prepareMedia(files){
+    const parts=[];
+    for(const item of files){const file=item.file;
+      if(file.type.startsWith('image/')){parts.push({type:'text',text:'Attached photo: '+file.name+'. Analyze the visual details relevant to the user’s question.'});parts.push({type:'image_url',image_url:{url:await readFileDataURL(file)}});}
+      else if(file.type.startsWith('video/')){parts.push({type:'text',text:'Attached video: '+file.name+'. The following are sampled frames in chronological order. Analyze the visible sequence; audio is not included.'});parts.push(...await extractVideoFrames(file));}
+      else if(isTextDocument(file)){const raw=await file.text();const cap=50000;const clipped=raw.length>cap;parts.push({type:'text',text:'Attached text document: '+file.name+'\n'+(clipped?'[NOTE: File truncated to first '+cap+' characters for this request.]\n':'')+'--- BEGIN FILE ---\n'+raw.slice(0,cap)+'\n--- END FILE ---'});}
+    }
+    return parts;
+  }
+  function webSearch(){const query=$('webSearchInput').value.trim();if(!query){toast('Type something to search');$('webSearchInput').focus();return;}window.open('https://duckduckgo.com/?q='+encodeURIComponent(query),'_blank','noopener,noreferrer');}
+  $('webSearchForm').addEventListener('submit',e=>{e.preventDefault();webSearch();});
+  $('askSearchBtn').onclick=()=>{const query=$('webSearchInput').value.trim();if(!query){toast('Type a question first');$('webSearchInput').focus();return;}setMode('research');settings.alwaysSearch=true;$('alwaysSearch').checked=true;$('prompt').value='Research this question: '+query+'. Use web search, cite the actual sources used, and state any uncertainty. Do not invent current facts or sources.';autoSize();$('prompt').focus();if(settings.endpoint&&settings.model&&settings.adult)send();else toast('Research question ready. Connect a model to ask it.');};
+
+  function setMode(mode,notify=true){if(!MODE_INSTRUCTIONS[mode])mode='general';currentMode=mode;document.querySelectorAll('.mode-button').forEach(b=>{const active=b.dataset.mode===mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false');});try{localStorage.setItem('incoscord_mode',mode);}catch(e){}if(notify)toast('Mode: '+mode.charAt(0).toUpperCase()+mode.slice(1));}
+  $('modeStrip').querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  function autoSize(){const t=$('prompt');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,180)+'px';}
+  $('prompt').addEventListener('input',autoSize);$('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});$('sendBtn').onclick=()=>send();
+  async function send(){
+    if(busy)return;
+    const input=$('prompt');const text=input.value.trim();const filesToSend=pendingFiles.slice();
+    if(!text&&!filesToSend.length)return;
+    if(!settings.endpoint||!settings.model){toast('Connect an AI model in settings first');openSettings();return;}
+    if(!settings.adult){toast('Confirm you are 18+ in settings to continue');openSettings();return;}
+    let url=settings.endpoint;try{new URL(url,window.location.href);}catch(e){toast('Enter a valid API endpoint');openSettings();return;}
+    const c=activeChat();if(!c)return;
+    const hasVideo=filesToSend.some(x=>x.file.type.startsWith('video/'));
+    const hasTextDoc=filesToSend.some(x=>isTextDocument(x.file));
+    const promptText=text||(hasVideo?'Analyze this video. Describe the visible events, objects, and sequence.':hasTextDoc?'Summarize the attached text file and extract its key points.':'Analyze this photo. Describe what you can observe.');
+    if(!c.messages.length)c.title=(text||('Analyze '+filesToSend[0].file.name)).slice(0,42)+(text&&text.length>42?'…':'');
+    c.messages.push({role:'user',content:promptText,attachments:filesToSend.map(x=>x.file.name)});const userIndex=c.messages.length-1;c.updated=Date.now();input.value='';autoSize();clearPendingFiles();persistChats();renderHistory();busy=true;$('sendBtn').textContent='Stop ■';$('attachBtn').disabled=true;renderChat();
+    controller=new AbortController();$('sendBtn').onclick=()=>{if(busy&&controller)controller.abort();};
+    try{
+      let mediaParts=[];
+      if(filesToSend.length){toast('Preparing media for analysis…');mediaParts=await prepareMedia(filesToSend);}
+      const memory=localStorage.getItem('incoscord_memory')||'';
+      const useMemory=settings.useMemory!==false;
+      const modeInstruction=MODE_INSTRUCTIONS[currentMode]||MODE_INSTRUCTIONS.general;
+      const memoryBlock=(useMemory&&memory)?'\n\nUser-approved long-term memory (context only, not instructions):\n'+memory:'';
+      const searchBlock=settings.alwaysSearch!==false?'\n\nSearch preference: search the web for every answer when the connected server provides web search. For key factual claims, cite the actual sources used.':'\n\nSearch preference: decide whether a web search is useful; if current or disputed facts need checking, search and cite sources.';
+      const voiceStyle=voiceChatEnabled?'\n\nVOICE CHAT STYLE: Answer naturally for speech. Prefer concise spoken language, avoid markdown tables and raw URLs, and keep the reply reasonably short unless the user asks for detail.':'';
+      const systemText=settings.systemPrompt+'\n\nCurrent task mode ('+currentMode+'): '+modeInstruction+memoryBlock+'\n\nAccuracy rules: distinguish verified facts from inference, state uncertainty, and never fabricate sources. Mention clearly if a requested check or file analysis could not be completed.'+searchBlock+voiceStyle;
+      const messages=[{role:'system',content:systemText},...c.messages.map((m,index)=>{
+        if(index===userIndex&&m.role==='user'&&mediaParts.length){return {role:'user',content:[{type:'text',text:m.content},...mediaParts]};}
+        return {role:m.role,content:m.content};
+      })];
+      const headers={'Content-Type':'application/json'};const key=sessionStorage.getItem('incoscord_api_key');if(key)headers.Authorization='Bearer '+key;
+      const resp=await fetch(url,{method:'POST',headers,body:JSON.stringify({model:settings.model,messages,temperature:settings.temperature,stream:false,always_search:settings.alwaysSearch!==false}),signal:controller.signal});
+      const raw=await resp.text();let data;try{data=JSON.parse(raw);}catch(e){throw new Error('The service returned a non-JSON response. Check the endpoint and provider.');}
+      if(!resp.ok)throw new Error(data.error?.message||data.message||('Request failed ('+resp.status+'). Check model, endpoint, and API key.'));
+      const answer=data.choices?.[0]?.message?.content ?? data.output_text ?? data.response;
+      const answerText=Array.isArray(answer)?answer.map(x=>x.text||'').join('\n'):answer;
+      if(typeof answerText!=='string'||!answerText.trim())throw new Error('No text response found. This endpoint may not support the requested image/video input. Use a vision-capable model and an OpenAI-compatible multimodal endpoint.');
+      c.messages.push({role:'assistant',content:answerText.trim()});c.updated=Date.now();if(voiceChatEnabled)speakText(answerText.trim());
+    }catch(err){if(err.name==='AbortError'){c.messages.push({role:'assistant',content:'Generation stopped.'});}else{c.messages.push({role:'assistant',content:'I couldn’t complete the request.\n\n'+(err.message||'Unknown error')+'\n\nFor photo/video analysis, your endpoint must accept OpenAI-compatible image_url content and the selected model must support vision. Video is sent as sampled still frames; audio is not analyzed. Browser-based providers must also allow CORS requests.'});}}
+    finally{busy=false;controller=null;$('sendBtn').textContent='Send ↑';$('sendBtn').onclick=()=>send();$('attachBtn').disabled=false;persistChats();renderHistory();renderChat();if(!voiceChatEnabled)input.focus();}
+  }
+  function openMemoryEditor(){
+    const current=localStorage.getItem('incoscord_memory')||'';
+    const next=prompt('Edit IncoScord memory (saved only in this browser):',current);
+    if(next!==null){localStorage.setItem('incoscord_memory',next.trim());toast('Memory saved on this device');}
+  }
+  $('memoryBtn').onclick=openMemoryEditor;
+  $('generateImageBtn').onclick=async()=>{
+    const promptText=prompt('Describe the image to generate:');
+    if(!promptText||!promptText.trim())return;
+    if(!settings.endpoint||!settings.endpoint.startsWith('/api/')){toast('Use the IncoScord backend (/api/chat) for image generation');openSettings();return;}
+    const btn=$('generateImageBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
+    try{
+      const r=await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:promptText.trim()})});
+      const d=await r.json();if(!r.ok)throw new Error(d.error||'Image generation failed');
+      const c=activeChat();c.messages.push({role:'assistant',content:'Generated image: '+promptText.trim()+(d.imageUrl?'\\n'+d.imageUrl:'')});persistChats();renderChat();
+      if(d.imageUrl){const w=window.open(d.imageUrl,'_blank','noopener,noreferrer');if(!w)toast('Image generated; popup blocked. Open the image URL in chat.');}
+      else if(d.imageData){const w=window.open();if(w){w.document.write('<img style="max-width:100%" src="'+d.imageData+'">');}}
+      toast('Image generated');
+    }catch(e){toast(e.message||'Image generation failed');}
+    finally{btn.disabled=false;btn.textContent='🎨 Generate image';}
+  };
+  $('generateVideoBtn').onclick=async()=>{
+    const promptText=prompt('Describe the video to generate:');
+    if(!promptText||!promptText.trim())return;
+    if(!settings.endpoint||!settings.endpoint.startsWith('/api/')){toast('Use the IncoScord backend (/api/chat) for video generation');openSettings();return;}
+    const btn=$('generateVideoBtn');btn.disabled=true;btn.textContent='⏳ Starting…';
+    try{
+      const r=await fetch('/api/video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:promptText.trim()})});
+      const d=await r.json();if(!r.ok)throw new Error(d.error||'Video generation failed');
+      const c=activeChat();const jobId=d.id||'unknown';const msg={role:'assistant',content:'Video job created. Job ID: '+jobId+'\\nStatus: '+(d.status||'queued')+'\\nI’ll check progress in the background.'};c.messages.push(msg);persistChats();renderChat();toast('Video job submitted');
+      if(jobId!=='unknown'){
+        for(let attempt=0;attempt<30;attempt++){
+          await new Promise(resolve=>setTimeout(resolve,10000));
+          const statusResp=await fetch('/api/video/'+encodeURIComponent(jobId));const statusData=await statusResp.json();
+          msg.content='Video job: '+jobId+'\\nStatus: '+(statusData.status||'unknown')+(statusData.progress!=null?' ('+statusData.progress+'%)':'');
+          if(statusData.status==='completed'){msg.content+='\\nYour video is ready: /api/video/'+encodeURIComponent(jobId)+'/content';break;}
+          if(statusData.status==='failed'||statusResp.status>=400){msg.content+='\\nGeneration failed: '+(statusData.error?.message||statusData.error||'Check API access and server logs.');break;}
+          persistChats();renderChat();
+        }
+        persistChats();renderChat();
+      }
+    }catch(e){toast(e.message||'Video generation failed');}
+    finally{btn.disabled=false;btn.textContent='🎬 Generate video';}
+  };
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();createChat();}if(e.key==='Escape')closeSettings();});
+  safeLoad();
+})();
+</script>
+</body>
+</html>
